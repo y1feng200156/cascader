@@ -64,7 +64,12 @@ class Cascader extends Component {
       value: initialValue,
       prevProps: props,
     };
-    this.defaultFieldNames = { label: 'label', value: 'value', children: 'children' };
+    this.defaultFieldNames = {
+      label: 'label',
+      value: 'value',
+      children: 'children',
+      loaded: 'loaded',
+    };
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -162,14 +167,36 @@ class Cascader extends Component {
     activeValue = activeValue.slice(0, menuIndex + 1);
     activeValue[menuIndex] = targetOption[this.getFieldName('value')];
     const activeOptions = this.getActiveOptions(activeValue);
-    if (targetOption.isLeaf === false && !targetOption[this.getFieldName('children')] && loadData) {
+    if (
+      targetOption.isLeaf === false &&
+      !targetOption[this.getFieldName('children')] &&
+      !targetOption[this.getFieldName('loaded')] &&
+      loadData
+    ) {
       if (changeOnSelect) {
         this.handleChange(activeOptions, { visible: true }, e);
       }
       this.setState({ activeValue });
-      loadData(activeOptions);
+      const promise = loadData(activeOptions);
+      if (promise && promise.then) {
+        const event = { ...e };
+        promise.then(() => {
+          this.extracted(
+            targetOption,
+            activeOptions,
+            event,
+            activeValue,
+            changeOnSelect,
+            expandTrigger,
+          );
+        });
+      }
       return;
     }
+    this.extracted(targetOption, activeOptions, e, activeValue, changeOnSelect, expandTrigger);
+  };
+
+  extracted(targetOption, activeOptions, e, activeValue, changeOnSelect, expandTrigger) {
     const newState = {};
     if (
       !targetOption[this.getFieldName('children')] ||
@@ -194,7 +221,8 @@ class Cascader extends Component {
       delete newState.value;
     }
     this.setState(newState);
-  };
+  }
+
   handleItemDoubleClick = () => {
     const { changeOnSelect } = this.props;
     if (changeOnSelect) {
