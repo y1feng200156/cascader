@@ -1,4 +1,5 @@
 import * as React from "react";
+import PropTypes from 'prop-types';
 
 export interface Props {
   value: any[],
@@ -17,7 +18,7 @@ export interface Props {
   loadData: (selectedOptions: object) => void,
   changeOnSelect: boolean,
   children: React.ReactNode,
-  onKeyDown: React.PropTypes.func,
+  onKeyDown: PropTypes.func,
   expandTrigger: string,
   fieldNames: object,
   filedNames: object,
