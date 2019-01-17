@@ -17,7 +17,7 @@ export interface Props {
   loadData: (selectedOptions: object) => void,
   changeOnSelect: boolean,
   children: React.ReactNode,
-  onKeyDown: PropTypes.func,
+  onKeyDown: React.PropTypes.func,
   expandTrigger: string,
   fieldNames: object,
   filedNames: object,
@@ -26,4 +26,4 @@ export interface Props {
   loadingIcon: React.ReactNode,
 }
 
-export default class Cascader extends React.Component<Props> {};
+export default class Cascader extends React.Component<Props> {}
